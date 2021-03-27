@@ -1,0 +1,11 @@
+pip install flask_login
+pip install flask_mail
+pip install flask_wtf
+pip install email_validator
+pip install flask_mysqldb
+pip install tweepy
+pip install textblob
+
+
+// to run this commands type bash file_name.txt in terminal
+// and also remove this line XD XD. example - bash some_libraries.txt

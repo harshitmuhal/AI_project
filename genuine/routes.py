@@ -12,56 +12,15 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 from flask import Flask, Response
-
-from flask import Flask, make_response
-import re
-import csv
-import re
-import emoji
-import nltk
-import pandas as pd
-import numpy as np
-import tweepy  # To consume Twitter's API  # For number computing
-from bs4 import BeautifulSoup
-from flask import Flask, request, render_template, send_file
-#from geopy.exc import GeocoderTimedOut
-#from geopy.geocoders import Nominatim
-from textblob import TextBlob
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import CountVectorizer
-from nltk.tokenize import TweetTokenizer
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing import sequence
-from sklearn.feature_extraction.text import TfidfVectorizer
-from keras.models import Sequential
-from keras.layers import Dense
-import h5py
-from tensorflow.keras.models import load_model
-from scipy.sparse import hstack
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-import csv
 import re
-import emoji
-import nltk
+import csv
 import pandas as pd
-import numpy as np
+import nltk
 import tweepy  # To consume Twitter's API  # For number computing
 from bs4 import BeautifulSoup
 from flask import Flask, request, render_template, send_file
-
 from textblob import TextBlob
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import CountVectorizer
-from nltk.tokenize import TweetTokenizer
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing import sequence
-from sklearn.feature_extraction.text import TfidfVectorizer
-from keras.models import Sequential
-from keras.layers import Dense
-import h5py
-from tensorflow.keras.models import load_model
-from scipy.sparse import hstack
 
 #nltk.download()
 import collections
@@ -69,28 +28,18 @@ from nltk.corpus import stopwords
 stemmer=nltk.PorterStemmer()
 stops = set(stopwords.words("english"))
 
-
 @app.route("/")
 
 @app.route("/home")
 def home():
-    page = request.args.get('page', 1, type=int)
-    posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
-    return render_template('home.html', posts=posts)
+    return render_template('home.html')
 
 @app.route('/credentials',methods=['GET','POST'])
 def credentials():
-    password=request.form['password']
-    if(password=="open"):
-        return redirect(url_for('login'))
-    return('Wrong Access Code')
-
-
+    return redirect(url_for('login'))
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    #if current_user.is_authenticated:
-     #   return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -101,11 +50,8 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    #if current_user.is_authenticated:
-     #   return render_template('analysis.html')         #redirect(url_for(' #home'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -158,112 +104,6 @@ def account():
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form)
 
-
-@app.route("/post/new", methods=['GET', 'POST'])
-@login_required
-def new_post():
-    form = PostForm()
-    if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, author=current_user)
-        db.session.add(post)
-        db.session.commit()
-        flash('Your post has been created!', 'success')
-        return redirect(url_for('home'))
-    return render_template('create_post.html', title='New Post',
-                           form=form, legend='New Post')
-
-
-@app.route("/post/<int:post_id>")
-def post(post_id):
-    post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=post.title, post=post)
-
-
-@app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
-@login_required
-def update_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
-        abort(403)
-    form = PostForm()
-    if form.validate_on_submit():
-        post.title = form.title.data
-        post.content = form.content.data
-        db.session.commit()
-        flash('Your post has been updated!', 'success')
-        return redirect(url_for('post', post_id=post.id))
-    elif request.method == 'GET':
-        form.title.data = post.title
-        form.content.data = post.content
-    return render_template('create_post.html', title='Update Post',
-                           form=form, legend='Update Post')
-
-
-@app.route("/post/<int:post_id>/delete", methods=['POST'])
-@login_required
-def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
-        abort(403)
-    db.session.delete(post)
-    db.session.commit()
-    flash('Your post has been deleted!', 'success')
-    return redirect(url_for('home'))
-
-
-@app.route("/user/<string:username>")
-def user_posts(username):
-    page = request.args.get('page', 1, type=int)
-    user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.filter_by(author=user)\
-        .order_by(Post.date_posted.desc())\
-        .paginate(page=page, per_page=5)
-    return render_template('user_posts.html', posts=posts, user=user)
-
-
-def send_reset_email(user):
-    token = user.get_reset_token()
-    msg = Message('Password Reset Request',
-                  sender='mlgssnhb@gmail.com',
-                  recipients=[user.email])
-    msg.body = f'''To reset your password, visit the following link:
-{url_for('reset_token', token=token, _external=True)}
-
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
-    mail.send(msg)
-
-
-@app.route("/reset_password", methods=['GET', 'POST'])
-def reset_request():
-    #if current_user.is_authenticated:
-     #   return redirect(url_for('home'))
-    form = RequestResetForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        send_reset_email(user)
-        flash('An email has been sent with instructions to reset your password.', 'info')
-        return redirect(url_for('login'))
-    return render_template('reset_request.html', title='Reset Password', form=form)
-
-
-@app.route("/reset_password/<token>", methods=['GET', 'POST'])
-def reset_token(token):
-    #if current_user.is_authenticated:
-     #   return redirect(url_for('home'))
-    user = User.verify_reset_token(token)
-    if user is None:
-        flash('That is an invalid or expired token', 'warning')
-        return redirect(url_for('reset_request'))
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user.password = hashed_password
-        db.session.commit()
-        flash('Your password has been updated! You are now able to log in', 'success')
-        return redirect(url_for('login'))
-    return render_template('reset_token.html', title='Reset Password', form=form)
-
 consumer_key ='VTJBKxgKMle3ajF6yKGlMgB3f'
 consumer_secret='PPOikMrLC33ZIwLMhpHsejE2QDbawo5ONmOz2zVjQ3xRoEnlAg'
 
@@ -279,14 +119,11 @@ api = tweepy.API(auth)
 
 @app.route('/index',methods=['GET','POST'])
 def analysis():
-
     if request.method=="POST":
         topic=request.form['topic'] #topic request keyword
         topic=topic+'-filter:retweets'
         test_data=api.search(topic, count =size,lang="en",tweet_mode='extended')
         user_name=[]
-        loc=[]
-        timezone=[]
         creationdatee=[]
         polarity=[]
         image=[]
@@ -297,122 +134,7 @@ def analysis():
         favourite_count=[]
         tweet_id=[]
         actual_tweets=[]
-        emoji_count=[] #to store the number of emojis used
-        words_number=[] #to store the number of words
-        # gender = [] how to get it? how to use this API https://genderapi.io/api-documentation ?
         bio=[]
-
-        #emoji dictionary
-        emoji_dict={'👿': -4.0, '🖕': -4.0, '😾': -4.0, '😡': -4.0, '😠': -3.0, '😧': -3.0, '💔': -3.0, '💩': -3.0, '😱': -3.0,
-                     '🙀': -3.0, '😈': -3.0, '😭': -3.0, '😟': -3.0, '👎': -2.0, '😰': -2.0, '😖': -2.0, '😕': -2.0, '😢': -2.0, '😿': -2.0,
-                     '😞': -2.0, '🤕': -2.0, '😨': -2.0, '😳': -2.0, '☹️': -2.0, '😬': -2.0, '🤥': -2.0, '🤢': -2.0, '😮': -2.0, '😣': -2.0,
-                     '💀': -2.0, '☠️': -2.0, '🤧': -2.0, '😫': -2.0, '😒': -2.0, '😩': -2.0, '😥': -1.0, '😵': -1.0, '🤒': -1.0, '👊': -1.0, '😦': -1.0,
-                     '👻': -1.0, '😯': -1.0, '😷': -1.0, '🤓': -1.0, '😔': -1.0, '🙄': -1.0, '🙁': -1.0, '😜': -1.0, '😓': -1.0, '🤔': -1.0, '🤐': -1.0,
-                     '🤡': 0.0, '🤤': 0.0, '😑': 0.0, '🤑': 0.0, '😐': 0.0, '😶': 0.0, '😴': 0.0, '😪': 0.0, '😝': 0.0, '😤': 0.0, '🙃': 0.0,
-                     '🤝': 1.0, '😆': 1.0, '🙏': 1.0, '🙂': 1.0, '😛': 1.0, '😎': 1.0, '👍': 2.0, '😲': 2.0, '😊': 2.0, '🤠': 2.0, '🤞': 2.0,
-                     '😁': 2.0, '😀': 2.0, '🤗': 2.0, '💋': 2.0, '😗': 2.0, '😽': 2.0, '😚': 2.0, '😙': 2.0, '👄': 2.0, '👌': 2.0, '☺️': 2.0,
-
-                     '😌': 2.0, '😄': 2.0, '😸': 2.0, '😃': 2.0, '😺': 2.0, '😏': 2.0, '😼': 2.0, '😅': 2.0, '✌️': 2.0, '💯': 3.0, '🖤': 3.0,
-                     '💙': 3.0, '👏': 3.0, '💘': 3.0, '💝': 3.0, '💚': 3.0, '❤️': 3.0, '😍': 3.0, '😻': 3.0, '💓': 3.0, '💗': 3.0, '😇': 3.0,
-                     '😂': 3.0, '😹': 3.0, '😘': 3.0, '💜': 3.0, '💞': 3.0, '💖': 3.0, '💕': 3.0, '😉': 3.0, '💛': 3.0, '😋': 3.0, '🙌': 4.0, '🤣': 4.0,
-                     '☠️': -2.0,
-                 '☹️': -2.0,'☺️': 2.0, '✌️': 2.0, '❤️': 3.0,'👄': 2.0,'👊': -1.0,'👌': 2.0,'👍': 2.0, '👎': -2.0, '👏': 3.0,'👻': -1.0,'👿': -4.0,'💀': -2.0,'💋': 2.0,
-                 '💓': 3.0, '💔': -3.0, '💕': 3.0,'💖': 3.0,'💗': 3.0, '💘': 3.0,'💙': 3.0, '💚': 3.0,
-                 '💛': 3.0,
-                 '💜': 3.0,
-                 '💝': 3.0,
-                 '💞': 3.0,
-                 '💩': -3.0,
-                 '💯': 3.0,
-                 '🖕': -4.0,
-                 '🖤': 3.0,
-                 '😀': 2.0,
-                 '😁': 2.0,
-                 '😂': 3.0,
-                 '😃': 2.0,
-                 '😄': 2.0,
-                 '😅': 2.0,
-                 '😆': 1.0,
-                 '😇': 3.0,
-                 '😈': -3.0,
-                 '😉': 3.0,
-                 '😊': 2.0,
-                 '😋': 3.0,
-                 '😌': 2.0,
-                 '😍': 3.0,
-                 '😎': 1.0,
-                 '😏': 2.0,
-                 '😐': 0.0,
-                 '😑': 0.0,
-                 '😒': -2.0,
-                 '😓': -1.0,
-                 '😔': -1.0,
-                 '😕': -2.0,
-                 '😖': -2.0,
-                 '😗': 2.0,
-                 '😘': 3.0,
-                 '😙': 2.0,
-                 '😚': 2.0,
-                 '😛': 1.0,
-                 '😜': -1.0,
-                 '😝': 0.0,
-                 '😞': -2.0,
-                 '😟': -3.0,
-                 '😠': -3.0,
-                 '😡': -4.0,
-                 '😢': -2.0,
-                 '😣': -2.0,
-                 '😤': 0.0,
-                 '😥': -1.0,
-                 '😦': -1.0,
-                 '😧': -3.0,
-                 '😨': -2.0,
-                 '😩': -2.0,
-                 '😪': 0.0,
-                 '😫': -2.0,
-                 '😬': -2.0,
-                 '😭': -3.0,
-                 '😮': -2.0,
-                 '😯': -1.0,
-                 '😰': -2.0,
-                 '😱': -3.0,
-                 '😲': 2.0,
-                 '😳': -2.0,
-                 '😴': 0.0,
-                 '😵': -1.0,
-                 '😶': 0.0,
-                 '😷': -1.0,
-                 '😸': 2.0,
-                 '😹': 3.0,
-                 '😺': 2.0,
-                 '😻': 3.0,
-                 '😼': 2.0,
-                 '😽': 2.0,
-                 '😾': -4.0,
-                 '😿': -2.0,
-                 '🙀': -3.0,
-                 '🙁': -1.0,
-                 '🙂': 1.0,
-                 '🙃': 0.0,
-                 '🙄': -1.0,
-                 '🙌': 4.0,
-                 '🙏': 1.0,
-                 '🤐': -1.0,
-                 '🤑': 0.0,
-                 '🤒': -1.0,
-                 '🤓': -1.0,
-                 '🤔': -1.0,
-                 '🤕': -2.0,
-                 '🤗': 2.0,
-                 '🤝': 1.0,
-                 '🤞': 2.0,
-                 '🤠': 2.0,
-                 '🤡': 0.0,
-                 '🤢': -2.0,
-                 '🤣': 4.0,
-                 '🤤': 0.0,
-                 '🤥': -2.0,
-                 '🤧': -2.0}
 
         def truncate(f, n):
             '''Truncates/pads a float f to n decimal places without rounding'''
@@ -422,18 +144,8 @@ def analysis():
             i, p, d = s.partition('.')
             return '.'.join([i, (d + '0' * n)[:n]])
 
-        def extract_emojis(s):
-            # a: str = ''.join(c for c in s if c in emoji.UNICODE_EMOJI)
-            a: str = ''.join(c for c in s if c in emoji_dict.keys())
-            if (a == ''):
-                return None
-            else:
-                return a
-
         for tweet in test_data:
             user_name.append(tweet.user.screen_name)
-            loc.append(tweet.user.location)
-            timezone.append(tweet.user.time_zone)
             creationdatee.append(tweet.created_at)
             polarity.append(truncate((TextBlob(tweet.full_text).sentiment.polarity), 3))
             image.append(tweet.user.profile_image_url_https)
@@ -446,79 +158,9 @@ def analysis():
             actual_tweets.append(tweet.full_text)
             bio.append(tweet.user.description)
 
-            # himu
-        emojis = []
-        for t in test_data:
-            emojis.append(extract_emojis(t.full_text))
-
-        for i in emojis:
-            if (i == None):
-                emoji_count.append(0)
-            else:
-                emoji_count.append(len(i))
-
-        def word_count(text):
-            text = str(text)
-            word_list = []
-            data = text.split(" ")
-            return (len(data))
-
-        for i in test_data:
-            words_number.append(word_count(i.full_text))
-
-        def val(emoj):
-            if (emoj == None):
-                return 0
-            for i in emoj:
-                sum = 0
-                if (i in emoji_dict.keys()):
-                    sum = sum + emoji_dict[i]
-            return sum
-
-        def calculate_emoji_strength(emoj):
-            if emoj == None:
-                return 0
-            else:
-                for i in emoj:
-                    if (len(i) == 0):
-                        return 0
-                    elif (len(i) == 1):
-                        return emoji_dict[emoj[0]]
-                    else:
-                        list_of_emoji_scores = []
-                        for i in emoj:
-                            list_of_emoji_scores.append(emoji_dict[i])
-
-                        max_score = max(list_of_emoji_scores)
-                        min_score = min(list_of_emoji_scores)
-                        return max_score + min_score
-
-        emoji_score = []
-
-        for i in emojis:
-            if (i == None):
-                emoji_score.append(0)
-            else:
-                emoji_score.append(val(i))
-
-        emoj_strength = []
-        for i in emojis:
-            emoj_strength.append(calculate_emoji_strength(i))
-
         creationdate = []
         for i in creationdatee:
             creationdate.append(i.strftime('%m/%d/%Y %I:%M:%S'))
-
-        loca = []
-        for i in loc:
-            loca.append(re.sub("[^a-zA-Z]", "", i))
-
-        location = []
-        for l in loca:
-            if not len(l) > 0:
-                location.append(l.replace(l, 'India'))
-            else:
-                location.append(l)
 
         preprocessed_words = []
 
@@ -541,20 +183,6 @@ def analysis():
             for we in meaningful_words:
                 preprocessed_words.append(we)
 
-        clean_test_reviews = []
-        # cleaning the tweet text
-        for tweet in actual_tweets:
-            # review_text = BeautifulSoup(tweet.text, "html5lib").get_text()
-            x = re.sub("[@]\w+", " ", tweet)  # remove usertags
-            x = re.sub("[^a-zA-Z]", " ", x)
-            x = re.sub("[#\(\)\[\]]", " ", x)  # remove brackets and from hashtags
-            x = re.sub("https?[\w./:]+", " ", x)  # remove urls
-            x = re.sub("\.{2,}", " ", x)  # replacing 2+ dots to space
-            x = re.sub("(.)\1+", "\1\1", x)  # replace multiple chars to 2 chars
-            x = re.sub("(-|\')", " ", x)  # removing -|\''
-            x = x.strip()  # to remove trailing spaces
-            clean_test_reviews.append(x)
-
         top_words1 = []
         for tweet1 in test_data:
             preprocessing(tweet1.full_text)
@@ -566,88 +194,13 @@ def analysis():
 
         top_words = top_words1[10:30]
 
-        output = pd.DataFrame(data={"SentimentText": actual_tweets[0:size], "Cleaned_text": clean_test_reviews[0:size],
+        output = pd.DataFrame(data={"SentimentText": actual_tweets[0:size],
                                     "UserName": user_name[0:size], "CreationDate": creationdate[0:size],
-                                    "Image": image[0:size], "Location": location[0:size],
+                                    "Image": image[0:size],
                                     "FollowerCount": follower_count[0:size], "FollowingCount": following_count[0:size],
                                     "Verified": verified_check[0:size], "ReTweet": retweets_count[0:size],
-                                    "Likes": favourite_count[0:size], "ID": tweet_id[0:size], "emoji_": emojis[0:size],
-                                    "emoji_count": emoji_count[0:size], "number_of_words": words_number[0:size],
-                                    "emoji_score": emoji_score[0:size], "emoji_strength": emoj_strength[0:size],
+                                    "Likes": favourite_count[0:size], "ID": tweet_id[0:size],
                                     "Polarity": polarity[0:size], "bio": bio[0:size]})
-
-        X = output.loc[:,['Cleaned_text', 'FollowerCount', 'FollowingCount', 'emoji_count', 'number_of_words', 'emoji_score',
-             'emoji_strength', 'bio']]
-        tokenizer = TweetTokenizer()
-
-        def tokenize(tweet):
-            try:
-                tweet = tweet.lower()
-                tokens = tokenizer.tokenize(tweet)
-                tokens = list(filter(lambda t: not t.startswith('@'), tokens))
-                tokens = list(filter(lambda t: not t.startswith('#'), tokens))
-                tokens = list(filter(lambda t: not t.startswith('http'), tokens))
-                return tokens
-            except:
-                return 'NC'
-
-        vocab_size = 1000
-
-        vectorizer = CountVectorizer(stop_words='english', max_features=vocab_size, tokenizer=tokenize)
-        vectorizer.fit(X.loc[:, 'Cleaned_text'])
-
-        train_embeddings = vectorizer.transform(X.loc[:, 'Cleaned_text'])
-
-        mean_train = X.loc[:, 'emoji_count'].mean()
-        std_train = X.loc[:, 'emoji_count'].std()
-
-        mean_train_cnt = X.loc[:, 'number_of_words'].mean()
-        std_train_cnt = X.loc[:, 'number_of_words'].std()
-
-        mean_train_f = X.loc[:, 'FollowerCount'].mean()
-        std_train_f = X.loc[:, 'FollowerCount'].std()
-
-        mean_train_f1 = X.loc[:, 'FollowingCount'].mean()
-        std_train_f1 = X.loc[:, 'FollowingCount'].std()
-
-        mean_train_p1 = X.loc[:, 'emoji_score'].mean()
-        std_train_p1 = X.loc[:, 'emoji_score'].std()
-
-        mean_train_s1 = X.loc[:, 'emoji_strength'].mean()
-        std_train_s1 = X.loc[:, 'emoji_strength'].std()
-
-        X['std_cnt_emoji'] = X['emoji_count'].map(lambda x: (x - mean_train) / std_train)
-        X['std_cnt_word'] = X['number_of_words'].map(lambda x: (x - mean_train_cnt) / std_train_cnt)
-        X['std_followers'] = X['FollowerCount'].map(lambda x: (x - mean_train_f) / std_train_f)
-        X['std_following'] = X['FollowingCount'].map(lambda x: (x - mean_train_f1) / std_train_f1)
-        X['std_emoji_pop'] = X['emoji_score'].map(lambda x: (x - mean_train_p1) / std_train_p1)
-        X['std_emoji_strength'] = X['emoji_strength'].map(lambda x: (x - mean_train_s1) / std_train_s1)
-
-        Xtrain_embedded = hstack((train_embeddings, np.array(X['std_cnt_emoji'])[:, None])).tocsr()
-        Xtrain_embedded = hstack((Xtrain_embedded, np.array(X['std_cnt_word'])[:, None])).tocsr()
-        Xtrain_embedded = hstack((Xtrain_embedded, np.array(X['std_followers'])[:, None])).tocsr()
-        Xtrain_embedded = hstack((Xtrain_embedded, np.array(X['std_following'])[:, None])).tocsr()
-        Xtrain_embedded = hstack((Xtrain_embedded, np.array(X['std_emoji_pop'])[:, None])).tocsr()
-        Xtrain_embedded = hstack((Xtrain_embedded, np.array(X['std_emoji_strength'])[:, None])).tocsr()
-
-        #model = load_model("sentiment_82.h5")
-        Xtrain_embedded = Xtrain_embedded[0:100]
-        Xtrain_embedded = Xtrain_embedded.todense()
-
-        def adjust(np_array):
-            for i in range(len(np_array)):
-                if (np_array[i] < -0.2):
-                    np_array[i] = -1
-                elif (np_array[i] >= -0.2 and np_array[i] <= 0.2):
-                    np_array[i] = 0
-                else:
-                    np_array[i] = 1
-            return np_array
-
-        # y = adjust(y_pred)
-        # output["Polarity"]= y
-
-        # polarity =y
 
         output.to_csv("Entire_Output.csv", index=False)
         with open("Entire_Output.csv", newline='') as csvfile:
@@ -655,9 +208,8 @@ def analysis():
             sortedlist = sorted(spamreader, key=lambda row: (row['Polarity']), reverse=True)
 
         with open('Sorted_Entire_Output.csv', 'w') as f:
-            fieldnames = ['SentimentText', 'Cleaned_text', 'UserName', 'CreationDate', 'Image', 'Location',
-                          'FollowerCount', 'FollowingCount', 'Verified', 'ReTweet', 'Likes', 'ID', 'emoji_',
-                          'emoji_count', 'number_of_words', 'emoji_score', 'emoji_strength', 'Polarity', 'bio']
+            fieldnames = ['SentimentText', 'UserName', 'CreationDate', 'Image', 'Location',
+                          'FollowerCount', 'FollowingCount', 'Verified', 'ReTweet', 'Likes', 'ID', 'Polarity', 'bio']
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             for row in sortedlist:
@@ -668,9 +220,8 @@ def analysis():
             rows0 = [row for row in reader if float(row['Polarity']) > 0]
 
         with open('Positive_Output.csv', 'w') as f:
-            fieldnames = ['SentimentText', 'Cleaned_text', 'UserName', 'CreationDate', 'Image', 'Location',
-                          'FollowerCount', 'FollowingCount', 'Verified', 'ReTweet', 'Likes', 'ID', 'emoji_',
-                          'emoji_count', 'number_of_words', 'emoji_score', 'emoji_strength', 'Polarity', 'bio']
+            fieldnames = ['SentimentText', 'UserName', 'CreationDate', 'Image', 'Location',
+                          'FollowerCount', 'FollowingCount', 'Verified', 'ReTweet', 'Likes', 'ID', 'Polarity', 'bio']
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             for row in rows0:
@@ -681,9 +232,8 @@ def analysis():
             rows1 = [row for row in reader if float(row['Polarity']) < 0]
 
         with open('Negative_Output.csv', 'w') as f:
-            fieldnames = ['SentimentText', 'Cleaned_text', 'UserName', 'CreationDate', 'Image', 'Location',
-                          'FollowerCount', 'FollowingCount', 'Verified', 'ReTweet', 'Likes', 'ID', 'emoji_',
-                          'emoji_count', 'number_of_words', 'emoji_score', 'emoji_strength', 'Polarity', 'bio']
+            fieldnames = ['SentimentText', 'UserName', 'CreationDate', 'Image', 'Location',
+                          'FollowerCount', 'FollowingCount', 'Verified', 'ReTweet', 'Likes', 'ID', 'Polarity', 'bio']
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             for row in rows1:
@@ -694,9 +244,8 @@ def analysis():
             rows2 = [row for row in reader if float(row['Polarity']) == 0.0]
 
         with open('Neutral_Output.csv', 'w') as f:
-            fieldnames = ['SentimentText', 'Cleaned_text', 'UserName', 'CreationDate', 'Image', 'Location',
-                          'FollowerCount', 'FollowingCount', 'Verified', 'ReTweet', 'Likes', 'ID', 'emoji_',
-                          'emoji_count', 'number_of_words', 'emoji_score', 'emoji_strength', 'Polarity', 'bio']
+            fieldnames = ['SentimentText', 'UserName', 'CreationDate', 'Image', 'Location',
+                          'FollowerCount', 'FollowingCount', 'Verified', 'ReTweet', 'Likes', 'ID', 'Polarity', 'bio']
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             for row in rows2:
@@ -746,11 +295,6 @@ def analysis():
         tweet_id2 = df2['ID']
         bio2 = df2['bio']
         row2, column2 = df2.shape
-
-        # with open("Sorted_Entire_Output.csv", 'r') as data:
-        #  counter = Counter()
-        # for row in csv.DictReader(data):
-        #   counter[row['Sentiment']] += 1
 
         positive = row0
         negative = row1

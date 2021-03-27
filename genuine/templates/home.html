@@ -53,7 +53,7 @@ body, html {
 
 /* First image (Logo. Full height) */
 .bgimg-1 {
-    background-image: url('static/images/twitter-hack.jpg');
+    background-image: url('static/images/2new_img.png');
     min-height: 100%;
     min-width: 50%;
 }
@@ -83,9 +83,7 @@ body, html {
       <i class="fa fa-bars"></i>
     </a>
     <a href="#home" class="w3-bar-item w3-button"><i class="fa fa-home"><h5>HOME</h5></i></a>
-    <a href="#about" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-user"><h5>ABOUT</h5></i></a>
-    <a href="#portfolio" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-th"><h5>FEATURES</h5></i></a>
-    <span class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-none"><h4>GENUINE METRICS</h4></span>
+    <span class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-none"><h4>SENTIFY</h4></span>
 
   </div>
 
@@ -101,13 +99,15 @@ body, html {
 
   <div class="w3-display-middle w3-padding w3-hide-small" style="width:35%">
     <div class="w3-black w3-opacity w3-hover-opacity-off w3-padding-large w3-round-large">
-      <h1 class="w3-center w3-padding-large w3-black  w3-xlarge w3-animate-opacity">GENUINE METRICS</h1>
+      <h1 class="w3-center w3-padding-large w3-black  w3-xlarge w3-animate-opacity">SENTIFY</h1>
       <hr class="w3-opacity">
-      <p ><h4 style="text-align:center;"> Enter the code: "open" - to access the tool</h4></p>
+      <p ><h4 style="text-align:justify;"> Feedback about a product or a service or both is a very important aspect of customer satisfaction for any firm.
+    This tool is an automated software which crawls the twitter to find and analyze references to entered keyword and categorize the feedback given uisng machine learning classification algorithms.</h4></p>
+    <br><br>
       <div class="w3-full" >
         <form method="POST" action="/credentials"  autocomplete="off">
-          <input class="w3-input w3-border w3-block" style="color:black;" type="text" name="password" placeholder="Enter code"><br>
-          <input class="w3-bar-item w3-button w3-blue w3-round" style="margin-left:180px;" type="submit" value="Submit" >
+          <!-- <input class="w3-input w3-border w3-block" style="color:black;" type="text" name="password" placeholder="Enter code"><br> -->
+          <input class="w3-bar-item w3-button w3-blue w3-round" style="margin-left:180px;" type="submit" value="Let's Start!!" >
         </form>
       </div>
     </div>
@@ -116,131 +116,10 @@ body, html {
 </div>
 
 
-<!-- Container (About Section) -->
-<div class="w3-content w3-container w3-padding-64" id="about">
-  <h1 class="w3-center"><b>ABOUT TOOL</b></h1>
-  <p> Feedback about a product or a service or both is a very important aspect of customer satisfaction for any firm.
-This tool is an automated software which crawls the social media to find and analyze references to entered keyword and categorize the feedback given uisng machine learning classification algorithms.
-</p>
-<!--
-  <p class="w3-large w3-center w3-padding-16">This tool is really good at:</p>
-  <p class="w3-wide"><i class="fa fa-camera"></i>SCRAPING ACCURATE REFERENCES</p>
-  <div class="w3-light-grey">
-    <div class="w3-container w3-padding-small w3-dark-grey w3-center" style="width:96.5%">96.5%</div>
-  </div>
-  <p class="w3-wide"><i class="fa fa-laptop"></i>CLASSIFICATION</p>
-  <div class="w3-light-grey">
-    <div class="w3-container w3-padding-small w3-dark-grey w3-center" style="width:85%">85%</div>
-  -->
-</div>
-
-</div>
-<br><br>
-
-<div class="w3-row w3-center w3-dark-grey w3-padding-16">
-  <div class="w3-quarter w3-section">
-    <span class="w3-large">Live tweet Analysis</span><br>
-
-  </div>
-  <div class="w3-quarter w3-section">
-    <span class="w3-large">3 Categories - Positive, Negative and Neutral</span><br>
-
-  </div>
-  <div class="w3-quarter w3-section">
-    <span class="w3-large">Firm Refinement</span><br>
-
-  </div>
-
-  <div class="w3-quarter w3-section">
-    <span class="w3-large">Find Potential Customer's</span><br>
-
-  </div>
-</div>
-<br>
-<br>
-<br>
-<!-- Second Parallax Image with Portfolio Text -->
-<div class=class="w3-content w3-container w3-padding-64, id="features">
-<div class="bgimg-2 w3-display-container w3-opacity-min", id="features">
-  <div class="w3-display-center">
-    <h1 class="w3-center"><b>FEATURES</b></h1>
-    <!--<span class="w3-xxlarge w3-text-black w3-wide">FEATURES</span> -->
-  </div>
-</div>
-
-<div class="w3-row-padding w3-center w3-section">
-  <br><br>
-
-    <div class="w3-col m3">
-      Language Translator
-      <img src="static/images/language_translator.png" style="width:200px; height:120px;" onclick="onClick(this)" class="w3-hover-opacity" alt="Quiet ocean">
-    </div>
-
-
-    <div class="w3-col m3">
-      Handling emoticons
-      <img src="static/images/emoticons.jpg" style="width:200px; height:120px;" onclick="onClick(this)" class="w3-hover-opacity" alt="My beloved typewriter">
-    </div>
-
-    <!--div class="w3-col m3">
-      Emphasis handling
-      <img src="static/images/emphasis.jpg" style="width:200px; height:120px;" onclick="onClick(this)" class="w3-hover-opacity" alt="Empty ghost train">
-    </div-->
-
-    <div class="w3-col m3">
-      Preview the popularity
-      <img src="static/images/descending_polarity.png" style="width:200px; height:120px;" onclick="onClick(this)" class="w3-hover-opacity" alt="Empty ghost train">
-    </div>
-
-</div>
-
-
-<!-- Container (Portfolio Section) -->
-<div class="w3-content w3-container w3-padding-64" id="portfolio">
-
-  <!--p class="w3-center"><em>Here are the features of the tool<br> Click on the images to make them bigger</em></p><br-->
-
-  <!-- Responsive Grid. Four columns on tablets, laptops and desktops. Will stack on mobile devices/small screens (100% width) -->
-  <div class="w3-row-padding w3-center">
-    <div class="w3-col m3">
-      Efficient and easy Data Visualization
-      <img src="static/images/ui.png" style="width:200px; height:120px;" onclick="onClick(this)" class="w3-hover-opacity" alt="The mist over the mountains">
-    </div>
-
-    <!--div class="w3-col m3">
-      Location from where the users expressed their views
-      <br>
-      <img src="static/images/map.png" style="width:200px; height:120px;" onclick="onClick(this)" class="w3-hover-opacity" alt="Coffee beans">
-    </div-->
-
-    <div class="w3-col m3">
-      Save time by viewing the results in descending order of polarity
-      <img src="static/images/descending_polarity.png" style="width:200px; height:120px;" onclick="onClick(this)" class="w3-hover-opacity" alt="Bear closeup">
-    </div>
-
-      <div class="w3-col m3">
-        Access to the followers of users for social connectivity
-        <img src="static/images/access.png" style="width:200px; height:120px;" onclick="onClick(this)" class="w3-hover-opacity" alt="The mist">
-      </div>
-
-
-  </div>
-</div>
-
-<!-- Modal for full size images on click-->
-<div id="modal01" class="w3-modal w3-black" onclick="this.style.display='none'">
-  <span class="w3-button w3-large w3-black w3-display-topright" title="Close Modal Image"><i class="fa fa-remove"></i></span>
-  <div class="w3-modal-content w3-animate-zoom w3-center w3-transparent w3-padding-64">
-    <img id="img01" class="w3-image">
-    <p id="caption" class="w3-opacity w3-large"></p>
-  </div>
-</div>
-
-
 <!-- Footer -->
 <footer class="w3-center w3-black w3-padding-64 w3-opacity w3-hover-opacity-off">
   <a href="#home" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>To the top</a>
-  <p>Made by : Himabindu</a></p>
+  <p><h4>Made by : Harsh Jain (2K18/CO/140) and Harshit Muhal (2K18/CO/145)</h4></a></p>
 </footer>
 
 
